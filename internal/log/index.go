@@ -17,3 +17,7 @@ type index struct {
 	mmap gommap.MMap
 	size uint64
 }
+
+func newIndex(f *os.File, c Config) (*index, error) {
+	idx := &index{}
+}
