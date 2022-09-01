@@ -1,8 +1,9 @@
-module github.com/Franklynoble/prolog
+module github.com/Franklynoble/proglog
 
 go 1.18
 
 require (
+     github.com/tysontate/gommap v0.0
 	github.com/gorilla/mux v1.8.0
 	github.com/stretchr/testify v1.8.0
 	google.golang.org/protobuf v1.25.0

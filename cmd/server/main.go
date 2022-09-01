@@ -3,7 +3,7 @@ package main
 import (
 	"log"
 
-	"github.com/Franklynoble/prolog/internal/server"
+	"github.com/Franklynoble/proglog/internal/server"
 )
 
 /*

@@ -4,7 +4,7 @@ syntax = "proto3";
 
 package log.v1;
 
-option go_package = "github.com/Franklynoble/prolog/api/log_v1";
+option go_package = "github.com/Franklynoble/proglog/api/log_v1";
 
 
 message Record {

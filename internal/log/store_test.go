@@ -16,9 +16,9 @@ var (
 func TestStoreAppendRead(t *testing.T) {
 	f, err := ioutil.TempFile("", "store_append_read_test")
 
-	// require.NoError(t, err)
 	require.NoError(t, err)
 	defer os.Remove(f.Name())
+	// require.Errorf(t, "%s\n sa, %s\n", err, err.Error())
 
 	s, err := newStore(f)
 
