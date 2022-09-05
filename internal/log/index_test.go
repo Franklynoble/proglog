@@ -20,8 +20,8 @@ error.
 /*
 We iterate over each entry and write it to the index. We check that we can
 read the same entry back via the Read() method. Then we verify that the in
-
 */
+
 func TestIndex(t *testing.T) {
 	f, err := ioutil.TempFile(os.TempDir(), "index_test")
 

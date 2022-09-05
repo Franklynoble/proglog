@@ -2,6 +2,7 @@ package log
 
 import (
 	"fmt"
+	"io"
 	"io/ioutil"
 	"os"
 	"path"
@@ -171,6 +172,7 @@ func (l *Log) Remove() error {
 	return os.RemoveAll(l.Dir)
 }
 
+//These methods tell us the offset range stored in the log.
 func (l *Log) LowestOffset() (uint64, error) {
 	l.mu.Lock()
 	defer l.mu.Unlock()
@@ -178,6 +180,14 @@ func (l *Log) LowestOffset() (uint64, error) {
 	return l.segments[0].baseOffset, nil
 }
 
+/*
+when we work on supporting
+a replicated, coordinated cluster, we’ll need this information to know what
+nodes have the oldest and newest data and what nodes are falling behind
+and need to replicate.
+*/
+
+//These methods tell us the offset range stored in the log.
 func (l *Log) HighestOffset() (uint64, error) {
 	l.mu.Lock()
 	defer l.mu.Unlock()
@@ -187,5 +197,73 @@ func (l *Log) HighestOffset() (uint64, error) {
 		return 0, nil
 	}
 	return off - 1, nil
+
+}
+
+/*
+Truncate(lowest uint64) removes all segments whose highest offset is lower than
+lowest. Because we don’t have disks with infinite space, we’ll periodically call
+Truncate() to remove old segments whose data we (hopefully) have processed
+by then and don’t need anymore.
+*/
+func (l *Log) Truncate(lowest uint64) error {
+	l.mu.Lock()
+
+	defer l.mu.Unlock()
+	var segments []*segment
+
+	for _, s := range l.segments {
+		if s.nextOffset <= lowest+1 {
+			if err := s.Remove(); err != nil {
+				return err
+			}
+			continue
+		}
+		segments = append(segments, s)
+	}
+	l.segments = segments
+	return nil
+
+}
+
+func (l *Log) Reader() io.Reader {
+
+	l.mu.Lock()
+	defer l.mu.Unlock()
+
+	readers := make([]io.Reader, len(l.segments))
+	for i, segment := range l.segments {
+		readers[i] = &originalReader{segment.store, 0}
+	}
+	return io.MultiReader(readers...)
+}
+
+type originalReader struct {
+	*store
+	off int64
+}
+
+/*
+Reader() returns an io.Reader to read the whole log. We’ll need this capability
+when we implement coordinate consensus and need to support snapshots
+and restoring a log. Reader() uses an io.MultiReader() call to concatenate the seg-
+ments’ stores. The segment stores are wrapped by the originReader type for two
+
+
+*/
+func (o *originalReader) Read(p []byte) (int, error) {
+	n, err := o.ReadAt(p, o.off)
+	o.off += int64(n)
+	return n, err
+
+}
+func (l *Log) newSegment(off uint64) error {
+	s, err := newSegment(l.Dir, off, l.Config)
+	if err != nil {
+		return err
+	}
+	l.segments = append(l.segments, s)
+	l.activeSegment = s
+	return nil
 
 }
