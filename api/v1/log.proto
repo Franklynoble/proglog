@@ -22,7 +22,7 @@ that the compiler turns into Go structs, like the ones we saw in the previous
 
 service Log {
      rpc Produce (ProduceRequest) returns (ProduceResponse){}
-     rpc Consume(ConsumeRequest) returns (ConsumeRequest){}
+     rpc Consume(ConsumeRequest) returns (ConsumeResponse){}
      rpc ConsumeStream(ConsumeRequest) returns (stream ConsumeResponse){}
      rpc ProduceStream(stream ProduceRequest) returns (stream ProduceResponse);
 }
