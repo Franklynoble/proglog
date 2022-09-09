@@ -26,6 +26,7 @@ func TestIndex(t *testing.T) {
 	f, err := ioutil.TempFile(os.TempDir(), "index_test")
 
 	require.NoError(t, err)
+	//require.Error(t, err, "got %d, expected %d")
 
 	defer os.Remove(f.Name())
 

@@ -35,6 +35,7 @@ func TestServer(t *testing.T) {
 			fn(t, client, config)
 		})
 	}
+
 }
 
 /*
@@ -84,6 +85,14 @@ func setupTest(t *testing.T, fn func(*Config)) (client api.LogClient,
 
 }
 
+/*
+
+/*
+tests that producing and consuming
+works by using our client and server to produce a record to the log, consume
+it back, and then check that the record we sent is the same one we got back
+*/
+
 func testProduceConsume(t *testing.T, client api.LogClient, config *Config) {
 	ctx := context.Background()
 
@@ -104,6 +113,12 @@ func testProduceConsume(t *testing.T, client api.LogClient, config *Config) {
 	require.Equal(t, want.Offset, consume.Record.Offset)
 }
 
+/*
+tests that our server responds
+with an api.ErrOffsetOutOfRange() error when a client tries to consume beyond the
+log’s boundaries.
+
+*/
 func testConsumePastBoundary(t *testing.T, client api.LogClient, config *Config) {
 	ctx := context.Background()
 	produce, err := client.Produce(ctx, &api.ProduceRequest{

@@ -72,7 +72,7 @@ func testInitExisting(t *testing.T, o *Log) {
 	}
 	for i := 3; i < 3; i++ {
 		_, err := o.Append(append)
-		require.Error(t, err)
+		require.NoError(t, err)
 	}
 	require.NoError(t, o.Close())
 
