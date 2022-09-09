@@ -6,10 +6,14 @@ import (
 	"net"
 	"testing"
 
+	//"github.com/cloudflare/cfssl/config"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials"
+	// "google.golang.org/grpc/internal/credentials"
 
 	api "github.com/Franklynoble/proglog/api/v1"
+	"github.com/Franklynoble/proglog/internal/config"
 	"github.com/Franklynoble/proglog/internal/log"
 )
 
@@ -50,11 +54,25 @@ func setupTest(t *testing.T, fn func(*Config)) (client api.LogClient,
 	cfg *Config, teardown func(),
 ) {
 	t.Helper()
-	l, err := net.Listen("tcp", ":0")
+	l, err := net.Listen("tcp", "127.0.0.1:0")
 	require.NoError(t, err)
 
-	clientOptions := []grpc.DialOption{grpc.WithInsecure()}
-	cc, err := grpc.Dial(l.Addr().String(), clientOptions...)
+	clientTLSConfig, err := config.SetupTLSConfig(config.TLSConfig{
+		CertFile: config.CAFile,
+	})
+
+	require.NoError(t, err)
+
+	clientCreds := credentials.NewTLS(clientTLSConfig)
+	cc, err := grpc.Dial(
+		l.Addr().String(),
+		grpc.WithTransportCredentials(clientCreds),
+	)
+	require.NoError(t, err)
+	client = api.NewLogClient(cc)
+
+	//clientOptions := []grpc.DialOption{grpc.WithInsecure()}
+	//cc, err := grpc.Dial(l.Addr().String(), clientOptions...)
 	require.NoError(t, err)
 
 	dir, err := ioutil.TempDir("", "server-test")

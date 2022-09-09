@@ -7,6 +7,16 @@ import (
 	"io/ioutil"
 )
 
+/*
+• Client *tls.Config is set up to verify the server’s certificate with the client’s
+by setting the *tls.Config’s RootCAs.
+• Client *tls.Config is set up to verify the server’s certificate and allow the
+server to verify the client’s certificate by setting its RootCAs and its Certificates.
+• Server *tls.Config is set up to verify the client’s certificate and allow the
+client to verify the server’s certificate by setting its ClientCAs, Certificate, and
+ClientAuth mode set to tls.RequireAndVerifyCert.
+*/
+
 func SetupTLSConfig(cfg TLSConfig) (*tls.Config, error) {
 
 	var err error
@@ -49,6 +59,9 @@ func SetupTLSConfig(cfg TLSConfig) (*tls.Config, error) {
 	return tlsConfig, nil
 
 }
+
+//TLSConfig defines the parameters that SetupTLSConfig() uses to determine what
+// type of *tls.Config to return.
 
 type TLSConfig struct {
 	CertFile       string
