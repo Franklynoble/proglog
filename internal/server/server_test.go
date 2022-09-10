@@ -10,6 +10,7 @@ import (
 	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
+
 	// "google.golang.org/grpc/internal/credentials"
 
 	api "github.com/Franklynoble/proglog/api/v1"
@@ -71,9 +72,19 @@ func setupTest(t *testing.T, fn func(*Config)) (client api.LogClient,
 	require.NoError(t, err)
 	client = api.NewLogClient(cc)
 
+	severTLSConfig, err := config.SetupTLSConfig(config.TLSConfig{
+		CertFile:       config.ServerCertFile,
+		KeyFile:        config.ServerKeyFile,
+		CAFile:         config.CAFile,
+		ServiceAddress: l.Addr().String(),
+		Server:         true,
+	})
+
 	//clientOptions := []grpc.DialOption{grpc.WithInsecure()}
 	//cc, err := grpc.Dial(l.Addr().String(), clientOptions...)
+
 	require.NoError(t, err)
+	serverCreds := credentials.NewTLS(severTLSConfig)
 
 	dir, err := ioutil.TempDir("", "server-test")
 	require.NoError(t, err)
@@ -87,7 +98,16 @@ func setupTest(t *testing.T, fn func(*Config)) (client api.LogClient,
 	if fn != nil {
 		fn(cfg)
 	}
-	server, err := NEWGRPCServer(cfg)
+
+	/*
+		we’re parsing the server’s cert and key, which we then use to
+		configure the server’s TLS credentials. We then pass those credentials as a
+		gRPC server option to our NewGRPCServer() function so it can create our gRPC
+		server with that option. gRPC server options are how you enable features in
+
+
+	*/
+	server, err := NEWGRPCServer(cfg, grpc.Creds(serverCreds))
 	require.NoError(t, err)
 
 	go func() {
@@ -100,7 +120,6 @@ func setupTest(t *testing.T, fn func(*Config)) (client api.LogClient,
 		l.Close()
 		clog.Remove()
 	}
-
 }
 
 /*
