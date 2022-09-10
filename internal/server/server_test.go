@@ -59,7 +59,9 @@ func setupTest(t *testing.T, fn func(*Config)) (client api.LogClient,
 	require.NoError(t, err)
 
 	clientTLSConfig, err := config.SetupTLSConfig(config.TLSConfig{
-		CertFile: config.CAFile,
+		CertFile: config.ClientCertFile,
+		KeyFile:  config.ClientKeyFile,
+		CAFile:   config.CAFile,
 	})
 
 	require.NoError(t, err)
