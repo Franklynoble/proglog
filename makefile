@@ -43,8 +43,15 @@ gencert:
 
 	mv  *.pem  *.csr  ${CONFIG_PATH}
 
+
+
+$(CONFIG_PATH)/model.conf:
+	    cp test/model.conf $(CONFIG_PATH)/model.conf
+$(CONFIG_PATH)/policy.csv:
+	    cp test/policy.csv $(CONFIG_PATH)/policy.csv	
+
  .PHONY:  test  
- test:
+ test: $(CONFIG_PATH)test/policy.csv $(CONFIG_PATH)test/model.conf
 		go test -race ./...	 
 
 
