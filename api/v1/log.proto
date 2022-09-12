@@ -6,12 +6,12 @@ package log.v1;
 
 option go_package = "github.com/Franklynoble/proglog/api/log_v1";
 
-
-message Record {
-     bytes value  = 1;
-     uint64 offset = 2;
-}
-
+// 
+// message Record {
+     // bytes value  = 1;
+     // uint64 offset = 2;
+// }
+// 
 
 /*
 The service keyword says that this is a service for the compiler to generate,
@@ -20,22 +20,36 @@ and response the endpoint accepts. The requests and responses are messages
 that the compiler turns into Go structs, like the ones we saw in the previous
 */
 
-service Log {
-     rpc Produce (ProduceRequest) returns (ProduceResponse){}
-     rpc Consume(ConsumeRequest) returns (ConsumeResponse){}
-     rpc ConsumeStream(ConsumeRequest) returns (stream ConsumeResponse){}
-     rpc ProduceStream(stream ProduceRequest) returns (stream ProduceResponse);
-}
 
-message ProduceRequest {
+// START: service
+service Log {
+     rpc Produce(ProduceRequest) returns (ProduceResponse) {}
+     rpc Consume(ConsumeRequest) returns (ConsumeResponse) {}
+     rpc ConsumeStream(ConsumeRequest) returns (stream ConsumeResponse) {}
+     rpc ProduceStream(stream ProduceRequest) returns (stream ProduceResponse) {}
+   }
+   // END: service
+   
+   // START: apis
+   message ProduceRequest  {
      Record record = 1;
-     }
-     message ProduceResponse {
-          uint64 offset = 1;
-     }
-     message ConsumeRequest {
-          uint64 offset = 1;
-     }
-     message ConsumeResponse {
-          Record record = 2;
-     }
+   }
+   
+   message ProduceResponse  {
+     uint64 offset = 1;
+   }
+   
+   message ConsumeRequest {
+     uint64 offset = 1;
+   }
+   
+   message ConsumeResponse {
+     Record record = 2;
+   }
+   // END: apis
+   
+   message Record {
+     bytes value = 1;
+     uint64 offset = 2;
+   }
+

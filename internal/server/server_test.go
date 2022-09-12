@@ -10,7 +10,6 @@ import (
 	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
-
 	// "google.golang.org/grpc/internal/credentials"
 
 	api "github.com/Franklynoble/proglog/api/v1"
@@ -224,6 +223,13 @@ func testProduceConsumeStream(t *testing.T, client api.LogClient, config *Config
 				Offset: uint64(i),
 			})
 		}
+	}
+
+	newClient := func(crtPath, keyPath string ) {
+		*grpc.ClientConn,
+		api.LogClient,
+		[]grpc.DialOption,
+	}{
 	}
 
 }
